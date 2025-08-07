@@ -62,13 +62,13 @@ model VerificationToken {
 }
 
 model Template {
-  id                    String          @id @default(cuid())
-  title                 String
-  content               String
-  language              String
-  createdAt             DateTime        @default(now())
-  updatedAt             DateTime        @updatedAt
-
-  userId                String
-  user                  User            @relation(fields: [userId], references: [id])
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  tags        String[] 
+  codeUrl     String  
+  language    String   
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
 }

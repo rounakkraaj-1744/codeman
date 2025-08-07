@@ -29,9 +29,16 @@ export function InputCode() {
                             </div>
                             <Input id="tags" type="text" required />
                         </div>
+                        <div className="grid gap-2">
+                            <Label>Description</Label>
+                            <Input
+                                id="description"
+                                type="text"
+                            />
+                        </div>
                         <div className="grid w-full max-w-sm items-center gap-3">
-                            <Label htmlFor="picture">Picture</Label>
-                            <Input id="picture" type="file" />
+                            <Label htmlFor="file">File</Label>
+                            <Input id="file" type="file" />
                         </div>
                         or
                         <div className="grid gap-2">
