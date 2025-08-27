@@ -8,7 +8,7 @@ interface AddTemplateProps {
 export default function AddTemplate({onClick}: AddTemplateProps) {
     return (
         <div>
-            <Button onClick={onClick}>
+            <Button onClick={onClick} className='hover:cursor-pointer'>
                 <Plus/>
                 Add Code Template
             </Button>
