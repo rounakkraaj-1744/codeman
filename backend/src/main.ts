@@ -8,6 +8,11 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api')
 
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -16,7 +21,7 @@ async function bootstrap() {
     }),
   )
 
-  const port = process.env.PORT || 3001
+  const port = process.env.PORT || 8080
   await app.listen(port)
   // eslint-disable-next-line no-console
   console.log(`NestJS server running on http://localhost:${port}`)

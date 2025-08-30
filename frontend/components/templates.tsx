@@ -156,7 +156,7 @@ export default function Templates() {
   // ✅ Fetch templates from API
   const fetchTemplates = async () => {
     try {
-      const res = await fetch("localhost:8080/api/templates");
+      const res = await fetch("http://localhost:8080/api/templates");
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -215,7 +215,7 @@ export default function Templates() {
     if (!confirm("Are you sure you want to delete this template?")) return;
 
     try {
-      const res = await fetch(`localhost:8080/api/templates/${templateId}`, {
+      const res = await fetch(`http://localhost:8080/api/templates/${templateId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -259,7 +259,7 @@ export default function Templates() {
     
     try {
       // Use API proxy to fetch code content to avoid CORS issues
-      const response = await fetch('localhost:8080/api/templates/code', {
+      const response = await fetch('http://localhost:8080/api/templates/code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -308,7 +308,7 @@ export default function Templates() {
   // ✅ Enhanced Handle template sharing with better error handling
   const handleShare = async (templateId: string) => {
     try {
-      const res = await fetch("localhost:8080/api/templates/share", {
+      const res = await fetch("http://localhost:8080/api/templates/share", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -340,10 +340,12 @@ export default function Templates() {
   return (
     <div>
       <div className="flex items-end justify-end">
-        <AddTemplate onClick={() => {
+        <div className="my-8 mx-12">
+          <AddTemplate onClick={() => {
           setEditingTemplate(null);
           setShowInputCode(true);
         }} />
+        </div>
 
         {showInputCode && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-all duration-300">

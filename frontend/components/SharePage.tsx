@@ -59,7 +59,7 @@ export default function SharePage() {
   useEffect(() => {
     async function fetchSharedTemplate() {
       try {
-        const res = await fetch(`localhost:8080/api/share/${token}`);
+        const res = await fetch(`http://localhost:8080/api/share/${token}`);
         const data = await res.json();
         
         if (!res.ok) {
