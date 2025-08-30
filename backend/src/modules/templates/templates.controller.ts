@@ -11,7 +11,6 @@ import {
   BadRequestException,
   ParseFilePipe,
   MaxFileSizeValidator,
-  FileTypeValidator,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { plainToClass } from "class-transformer";
@@ -19,6 +18,7 @@ import { validate } from "class-validator";
 import { TemplatesService } from "./templates.service";
 import { CreateTemplateDto } from "./dto/create-template.dto";
 import { UpdateTemplateDto } from "./dto/update-template.dto";
+import { FileExtensionValidator } from "./validators/file-extension.validator";
 import type { Express } from "express";
 
 @Controller("templates")
@@ -43,8 +43,8 @@ export class TemplatesController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
-          new FileTypeValidator({ 
-            fileType: /\.(js|ts|tsx|jsx|py|java|rs|cpp|c|go|txt|md|json|xml|html|css|sql|sh|bat|yml|yaml)$/i 
+          new FileExtensionValidator({ 
+            allowedExtensions: /\.(js|ts|tsx|jsx|py|java|rs|cpp|c|go|txt|md|json|xml|html|css|sql|sh|bat|yml|yaml)$/i 
           }),
         ],
         fileIsRequired: false,
@@ -55,6 +55,7 @@ export class TemplatesController {
       hasFile: !!file,
       fileSize: file?.size,
       fileName: file?.originalname,
+      mimeType: file?.mimetype,
       bodyKeys: Object.keys(rawBody || {}),
       title: rawBody?.title,
       hasCode: !!rawBody?.code
@@ -141,8 +142,8 @@ export class TemplatesController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 10 * 1024 * 1024 }), // 10MB
-          new FileTypeValidator({ 
-            fileType: /\.(js|ts|tsx|jsx|py|java|rs|cpp|c|go|txt|md|json|xml|html|css|sql|sh|bat|yml|yaml)$/i 
+          new FileExtensionValidator({ 
+            allowedExtensions: /\.(js|ts|tsx|jsx|py|java|rs|cpp|c|go|txt|md|json|xml|html|css|sql|sh|bat|yml|yaml)$/i 
           }),
         ],
         fileIsRequired: false,
@@ -154,6 +155,7 @@ export class TemplatesController {
       hasFile: !!file,
       fileSize: file?.size,
       fileName: file?.originalname,
+      mimeType: file?.mimetype,
       bodyKeys: Object.keys(rawBody || {}),
       title: rawBody?.title,
       hasCode: !!rawBody?.code

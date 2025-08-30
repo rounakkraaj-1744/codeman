@@ -217,7 +217,7 @@ export class S3Service {
     const date = new Date().toISOString().slice(0, 10) // YYYY-MM-DD format
     const uuid = randomUUID()
     
-    const key = `code/${date}/${uuid}${ext}`
+    const key = `templates/${uuid}${ext}`
     
     console.log("Generated S3 key:", {
       originalFileName: fileName,

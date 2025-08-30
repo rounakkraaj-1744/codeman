@@ -57,7 +57,7 @@ export function Navbar() {
           <DialogContent className="p-0">
             <DialogHeader>
               <DialogTitle className="w-full">
-                <Command className="rounded-lg border shadow-md md:min-w-[450px]">
+                <Command className="rounded-lg shadow-2xl md:min-w-[450px]">
                   <CommandInput placeholder="Search Templates ..." />
                   <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
