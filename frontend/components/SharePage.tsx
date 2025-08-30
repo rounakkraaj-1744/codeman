@@ -1,4 +1,3 @@
-// /app/share/[token]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -16,14 +15,10 @@ const SyntaxHighlighter = ({ code, language }: { code: string; language: string 
       <div className="flex justify-between items-center mb-3">
         <span className="text-sm text-gray-400 font-mono">{language}</span>
         <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
+          <Button size="sm" variant="ghost" onClick={() => {
               navigator.clipboard.writeText(code);
               toast("Code copied to clipboard!" );
-            }}
-          >
+            }}>
             <Copy className="h-4 w-4" />
           </Button>
           <Button

@@ -4,12 +4,18 @@ import { connectDB } from "@/lib/mongodb";
 import { Template } from "@/models/template.model";
 
 function inferLangFromContent(content: string): string {
-  if (content.includes("import React") || content.includes("JSX")) return "tsx";
-  if (content.includes("public static void main")) return "java";
-  if (content.includes("fn main()")) return "rs";
-  if (content.includes("def ")) return "py";
-  if (content.includes("#include")) return "cpp";
-  if (content.includes("package main")) return "go";
+  if (content.includes("import React") || content.includes("JSX"))
+    return "tsx";
+  if (content.includes("public static void main"))
+    return "java";
+  if (content.includes("fn main()"))
+    return "rs";
+  if (content.includes("def "))
+    return "py";
+  if (content.includes("#include"))
+    return "cpp";
+  if (content.includes("package main"))
+    return "go";
   return "txt";
 }
 
@@ -39,7 +45,10 @@ export async function POST(req: NextRequest) {
     const file = data.get("file") as File | null;
 
     if (!title || !description || !tagsRaw) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json({ 
+        success: false, 
+        error: "Missing required fields" 
+      }, { status: 400 });
     }
 
     const tags = tagsRaw.split(".").map(tag => tag.trim()).filter(Boolean);
@@ -60,20 +69,21 @@ export async function POST(req: NextRequest) {
         contentType: "text/plain"
       });
     } else {
-      return NextResponse.json({ error: "No code or file provided" }, { status: 400 });
+      return NextResponse.json({ 
+        success: false, 
+        error: "No code or file provided" 
+      }, { status: 400 });
     }
 
-    const saved = await Template.create({
-      title,
-      description,
-      tags,
-      codeurl
-    });
+    const saved = await Template.create({ title, description, tags, codeurl });
 
     return NextResponse.json({ success: true, template: saved });
 
   } catch (err) {
     console.error("Error saving template:", err);
-    return NextResponse.json({ error: "Server Error" }, { status: 500 });
+    return NextResponse.json({ 
+      success: false, 
+      error: "Server Error" 
+    }, { status: 500 });
   }
 }

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Upload, Code2, Save, RotateCcw } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 interface InputCodeProps {
   onSuccess: (template: any) => void;
@@ -25,9 +26,9 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
     if (editingTemplate) {
       const form = document.querySelector('form') as HTMLFormElement;
       if (form) {
-        (form.elements.namedItem('title') as HTMLInputElement).value = editingTemplate.title;
-        (form.elements.namedItem('description') as HTMLTextAreaElement).value = editingTemplate.description;
-        (form.elements.namedItem('tags') as HTMLInputElement).value = editingTemplate.tags.join('.');
+        (form.elements.namedItem('title') as HTMLInputElement).value = editingTemplate.title || '';
+        (form.elements.namedItem('description') as HTMLTextAreaElement).value = editingTemplate.description || '';
+        (form.elements.namedItem('tags') as HTMLInputElement).value = editingTemplate.tags?.join('.') || '';
       }
     }
   }, [editingTemplate]);
@@ -40,24 +41,37 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
     const formData = new FormData(form);
 
     try {
-      const url = editingTemplate 
-        ? `/api/templates/${editingTemplate._id}` 
-        : "/api/templates";
+      const url = editingTemplate ? `/api/templates/${editingTemplate._id}` : "/api/templates";
       
       const method = editingTemplate ? "PUT" : "POST";
+
+      console.log(`${editingTemplate ? 'Updating' : 'Creating'} template:`, {
+        url,
+        method,
+        title: formData.get('title'),
+        hasFile: !!selectedFile,
+        hasCode: !!formData.get('code')
+      });
 
       const res = await fetch(url, {
         method,
         body: formData,
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Operation failed");
+        throw new Error(data.message || data.error || `HTTP error! status: ${res.status}`);
       }
 
-      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || data.error || "Operation failed");
+      }
+
       console.log("Template operation successful:", data);
+      
+      // Show success message
+      toast.success(editingTemplate ? "Template updated successfully!" : "Template created successfully!");
       
       // Reset form
       form.reset();
@@ -68,7 +82,8 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
       
     } catch (err) {
       console.error("Error with template operation:", err);
-      alert(err instanceof Error ? err.message : "An error occurred");
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      toast.error(`Failed to ${editingTemplate ? 'update' : 'create'} template: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -90,13 +105,37 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setSelectedFile(e.dataTransfer.files[0]);
+      const file = e.dataTransfer.files[0];
+      setSelectedFile(file);
+      
+      // Set the file input value (for form submission)
+      const fileInput = document.getElementById('file') as HTMLInputElement;
+      if (fileInput) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+      }
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleReset = () => {
+    const form = document.querySelector('form') as HTMLFormElement;
+    form?.reset();
+    setSelectedFile(null);
+    
+    // If editing, repopulate with original values
+    if (editingTemplate) {
+      setTimeout(() => {
+        (form?.elements.namedItem('title') as HTMLInputElement).value = editingTemplate.title || '';
+        (form?.elements.namedItem('description') as HTMLTextAreaElement).value = editingTemplate.description || '';
+        (form?.elements.namedItem('tags') as HTMLInputElement).value = editingTemplate.tags?.join('.') || '';
+      }, 0);
     }
   };
 
@@ -187,7 +226,9 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
 
             {/* File Upload Area */}
             <div className="space-y-4">
-              <Label className="text-sm font-semibold">Code Source</Label>
+              <Label className="text-sm font-semibold">
+                Code Source {!editingTemplate && <span className="text-muted-foreground">(optional if updating)</span>}
+              </Label>
               
               <div
                 className={`relative border-2 border-dashed rounded-xl p-8 transition-all duration-200 ${
@@ -228,6 +269,11 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
                       <p className="text-sm text-muted-foreground">
                         Supports: .js, .ts, .tsx, .py, .java, .rs, .cpp, .c, .go, and more
                       </p>
+                      {editingTemplate && (
+                        <p className="text-xs text-muted-foreground italic">
+                          Leave empty to keep current code file
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>
@@ -254,6 +300,11 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
                   className="min-h-[120px] font-mono text-sm focus:ring-2 focus:ring-primary/20 resize-none"
                   rows={6}
                 />
+                {editingTemplate && (
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to keep current code content
+                  </p>
+                )}
               </div>
             </div>
 
@@ -282,14 +333,10 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
                 type="button" 
                 variant="outline"
                 className="h-12 px-6"
-                onClick={() => {
-                  const form = document.querySelector('form') as HTMLFormElement;
-                  form?.reset();
-                  setSelectedFile(null);
-                }}
+                onClick={handleReset}
               >
                 <RotateCcw className="h-4 w-4 mr-2" />
-                Reset
+                {editingTemplate ? "Restore" : "Reset"}
               </Button>
             </div>
           </form>
