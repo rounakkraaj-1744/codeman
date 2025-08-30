@@ -41,7 +41,7 @@ export function InputCode({ onSuccess, onCancel, editingTemplate }: InputCodePro
     const formData = new FormData(form);
 
     try {
-      const url = editingTemplate ? `/api/templates/${editingTemplate._id}` : "/api/templates";
+      const url = editingTemplate ? `localhost:8080/api/templates/${editingTemplate._id}` : "localhost:8080//api/templates";
       
       const method = editingTemplate ? "PUT" : "POST";
 

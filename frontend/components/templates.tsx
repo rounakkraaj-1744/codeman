@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Link from "next/link";
-import { Code2, Edit, Share, Trash2, X, Copy, Download, FileText, Calendar, Tag } from "lucide-react";
+import { Code2, Edit, Share, Trash2, Copy, Download, FileText, Calendar, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -157,7 +156,7 @@ export default function Templates() {
   // ✅ Fetch templates from API
   const fetchTemplates = async () => {
     try {
-      const res = await fetch("/api/templates");
+      const res = await fetch("localhost:8080/api/templates");
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -216,7 +215,7 @@ export default function Templates() {
     if (!confirm("Are you sure you want to delete this template?")) return;
 
     try {
-      const res = await fetch(`/api/templates/${templateId}`, {
+      const res = await fetch(`localhost:8080/api/templates/${templateId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -260,7 +259,7 @@ export default function Templates() {
     
     try {
       // Use API proxy to fetch code content to avoid CORS issues
-      const response = await fetch('/api/templates/code', {
+      const response = await fetch('localhost:8080/api/templates/code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -309,7 +308,7 @@ export default function Templates() {
   // ✅ Enhanced Handle template sharing with better error handling
   const handleShare = async (templateId: string) => {
     try {
-      const res = await fetch("/api/templates/share", {
+      const res = await fetch("localhost:8080/api/templates/share", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
